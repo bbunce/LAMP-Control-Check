@@ -15,19 +15,30 @@ def list_files(folder):
 def check_controls(workbatch):
     try:
         wb = openpyxl.load_workbook(workbatch)
-        export_ws = wb.get_sheet_by_name('Export')
+        # export_ws = wb.get_sheet_by_name('Export')
+        setup_ws = wb.get_sheet_by_name('Setup')
 
         ntcFailCount = 0
         posFailCount = 0
 
-        for i in range(1, 100):
-            if str(export_ws.cell(row=i, column=1).value) == 'NTC' and \
-                str(export_ws.cell(row=i, column=2).value) == 'COVID' and \
-                    str(export_ws.cell(row=i, column=3).value) != 'NOT DETECTED':
+        # for i in range(1, 100):
+        #     if str(export_ws.cell(row=i, column=1).value) == 'NTC' and \
+        #         str(export_ws.cell(row=i, column=2).value) == 'COVID' and \
+        #             str(export_ws.cell(row=i, column=3).value) != 'NOT DETECTED':
+        #         ntcFailCount += 1
+        #     if str(export_ws.cell(row=i, column=1).value) == 'POSITIVE' and \
+        #             str(export_ws.cell(row=i, column=2).value) == 'COVID' and \
+        #                 str(export_ws.cell(row=i, column=3).value) != 'Control Positive':
+        #         posFailCount += 1
+
+        for i in range(2, 9):
+            if setup_ws.cell(row=17, column=i).value == 'NTC' and \
+                (setup_ws.cell(row=21, column=i).value != 'NEGATIVE' or \
+                len(setup_ws.cell(row=20, column=i).value) >=1):
                 ntcFailCount += 1
-            if str(export_ws.cell(row=i, column=1).value) == 'POSITIVE' and \
-                    str(export_ws.cell(row=i, column=2).value) == 'COVID' and \
-                        str(export_ws.cell(row=i, column=3).value) != 'Control Positive':
+            if setup_ws.cell(row=17, column=i).value == 'POSITIVE' and \
+                (setup_ws.cell(row=21, column=i).value != 'Control Positive' or \
+                setup_ws.cell(row=20, column=i).value <= 86.0):
                 posFailCount += 1
 
         if ntcFailCount != 0 or posFailCount != 0:
